@@ -1,61 +1,234 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏥 PreWork - Healthcare Monitoring System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-v10.x-red.svg)](https://laravel.com)
+[![Filament](https://img.shields.io/badge/Filament-v3.x-orange.svg)](https://filamentphp.com)
+[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## About Laravel
+Sistem monitoring pemeriksaan kesehatan karyawan berbasis web yang dibangun dengan Laravel dan Filament. Dirancang untuk memantau dan melacak pemeriksaan tekanan darah harian karyawan dengan tampilan dashboard yang professional dan real-time monitoring.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## ✨ Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🖥️ Admin Dashboard
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **📊 Interactive Charts** - Grafik harian dan bulanan dengan filter periode
+-   **👥 Employee Management** - Kelola data karyawan (NRP, nama, jabatan, departemen)
+-   **📅 Roster Management** - Atur jadwal shift karyawan (shift 1, shift 2, off, cuti, dll)
+-   **💓 Blood Pressure Tracking** - Catat hasil pemeriksaan tekanan darah harian
+-   **📈 Period Reports** - Laporan periode dengan export Excel
+-   **🎨 Custom Purple Theme** - Tema sidebar purple yang elegant
 
-## Learning Laravel
+### 🌐 Public Monitoring
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   **📱 Real-time Dashboard** - Monitoring publik tanpa login
+-   **📋 Employee List** - Daftar karyawan yang belum melakukan pemeriksaan
+-   **📊 Live Statistics** - Statistik pemeriksaan hari ini (total, sudah periksa, belum periksa)
+-   **🔄 Auto Refresh** - Update otomatis setiap 5 menit
+-   **💬 Inspirational Quotes** - Quotes motivasi dari tokoh terkenal
+-   **📱 Mobile Responsive** - Tampilan optimal di semua device
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 🎯 Key Highlights
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   **Filter by Shift** - Focus pada shift 1 dan shift 2 saja
+-   **Status Tracking** - Monitor status pemeriksaan real-time
+-   **Professional UI** - Interface modern dengan Tailwind CSS
+-   **Export Reports** - Export laporan ke Excel
+-   **Print Ready** - Siap untuk dicetak
 
-## Laravel Sponsors
+## 🚀 Quick Start
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Prerequisites
 
-### Premium Partners
+-   PHP 8.1+
+-   Composer
+-   Node.js & NPM
+-   MySQL 5.7+
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Installation
 
-## Contributing
+1. **Clone Repository**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```bash
+    git clone https://github.com/nshidayatullah/PreWork.git
+    cd PreWork
+    ```
 
-## Code of Conduct
+2. **Install Dependencies**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+    ```bash
+    # Install PHP dependencies
+    composer install
 
-## Security Vulnerabilities
+    # Install Node.js dependencies
+    npm install
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Environment Setup**
 
-## License
+    ```bash
+    # Copy environment file
+    cp .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+    # Generate application key
+    php artisan key:generate
+    ```
+
+4. **Database Configuration**
+
+    ```bash
+    # Edit .env file with your database credentials
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=your_database_name
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
+    ```
+
+5. **Run Migrations**
+
+    ```bash
+    php artisan migrate
+    ```
+
+6. **Build Assets**
+
+    ```bash
+    # Development
+    npm run dev
+
+    # Production
+    npm run build
+    ```
+
+7. **Start Development Server**
+    ```bash
+    php artisan serve
+    ```
+
+## 📱 Usage
+
+### Admin Panel
+
+-   **URL**: `http://localhost:8000/medic`
+-   **Features**: Dashboard, Employee management, Roster scheduling, Blood pressure tracking
+
+### Public Monitoring
+
+-   **URL**: `http://localhost:8000/monitoring`
+-   **Features**: Real-time employee examination status, statistics, auto-refresh
+
+## 🗄️ Database Structure
+
+### Main Tables
+
+-   **employees** - Karyawan (NRP, Name, Position, Department, Company, Status)
+-   **rosters** - Jadwal shift (employee_id, date, shift, month)
+-   **blood_pressures** - Hasil pemeriksaan (employee_id, date, sistole, diastole, status)
+
+### Key Relationships
+
+-   Employee → hasMany → Rosters
+-   Employee → hasMany → BloodPressures
+-   Roster → belongsTo → Employee
+-   BloodPressure → belongsTo → Employee
+
+## 🎨 Screenshots
+
+### Admin Dashboard
+
+![Dashboard](https://via.placeholder.com/800x400/6b21a8/ffffff?text=Admin+Dashboard+with+Purple+Theme)
+
+### Public Monitoring
+
+![Public Monitoring](https://via.placeholder.com/800x400/667eea/ffffff?text=Public+Monitoring+Page)
+
+### Period Reports
+
+![Reports](https://via.placeholder.com/800x400/9333ea/ffffff?text=Period+Reports+with+Charts)
+
+## 🔧 Configuration
+
+### Custom Theme
+
+The application uses a custom purple theme located in:
+
+```
+resources/css/filament/medic/theme.css
+```
+
+### Filament Configuration
+
+```php
+// app/Providers/Filament/MedicPanelProvider.php
+$panel->viteTheme('resources/css/filament/medic/theme.css')
+```
+
+## 📊 API Endpoints
+
+### Public API
+
+```bash
+GET /public/api/unexamined-employees
+```
+
+Returns JSON data of employees who haven't been examined today.
+
+## 🚀 Deployment
+
+### Production Build
+
+```bash
+# Build assets
+npm run build
+
+# Optimize for production
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### Server Requirements
+
+-   PHP 8.1+ with extensions: BCMath, Ctype, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML
+-   MySQL 5.7+ or MariaDB 10.3+
+-   Web server (Apache/Nginx)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m '✨ Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Developer
+
+**Ns. Hidayatullah**
+
+-   GitHub: [@nshidayatullah](https://github.com/nshidayatullah)
+-   Email: [your.email@example.com](mailto:your.email@example.com)
+
+## 🙏 Acknowledgments
+
+-   [Laravel](https://laravel.com) - The PHP Framework
+-   [Filament](https://filamentphp.com) - Admin Panel Framework
+-   [Tailwind CSS](https://tailwindcss.com) - CSS Framework
+-   [Chart.js](https://chartjs.org) - Charts Library
+-   [FontAwesome](https://fontawesome.com) - Icons
+
+---
+
+<div align="center">
+
+**Made with ❤️ for Healthcare Excellence**
+
+_"Kesehatan adalah mahkota di kepala orang sehat yang hanya dapat dilihat oleh orang yang sakit." - Imam Syafi'i_
+
+</div>
+# awalshift
