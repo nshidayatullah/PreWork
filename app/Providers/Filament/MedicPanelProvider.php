@@ -7,8 +7,9 @@ use Filament\Panel;
 use Filament\Widgets;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Widgets\PeriodReportDailyChart;
-use Widgets\PeriodReportMonthlyChart;
+// Perbaiki import widget ini:
+use App\Filament\Widgets\PeriodReportDailyChart;
+use App\Filament\Widgets\PeriodReportMonthlyChart;
 use App\Filament\Pages\Auth\LoginCustom;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
@@ -21,7 +22,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
-
 
 class MedicPanelProvider extends PanelProvider
 {
@@ -66,7 +66,6 @@ class MedicPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-
             ->plugin(FilamentSpatieRolesPermissionsPlugin::make());
     }
 }
