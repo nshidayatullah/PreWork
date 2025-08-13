@@ -277,7 +277,7 @@
                     @endif
                 </div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ $checkDateTime->locale('id')->isoFormat('dddd, HH:mm') }} WIB
+                    {{ $checkDateTime->locale('id')->isoFormat('dddd, HH:mm') }} WITA
                 </div>
             @else
                 <div class="text-lg font-bold text-gray-900 dark:text-gray-100">-</div>

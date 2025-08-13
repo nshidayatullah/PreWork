@@ -32,7 +32,7 @@ class ListEmployeeReports extends ListRecords
             'all' => Tab::make('Semua Karyawan')
                 ->badge(\App\Models\Employee::count()),
 
-            'active' => Tab::make('Ovservasi Aktif')
+            'active' => Tab::make('Observasi Aktif')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('Status', true))
                 ->badge(\App\Models\Employee::where('Status', true)->count()),
 
