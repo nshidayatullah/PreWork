@@ -10,7 +10,7 @@
             // Indonesian date format
             $tanggalIndonesia = \Carbon\Carbon::parse($bp->date)->locale('id')->isoFormat('DD MMMM YYYY');
             $hariIndonesia = \Carbon\Carbon::parse($bp->date)->locale('id')->isoFormat('dddd');
-            $waktuPemeriksaan = \Carbon\Carbon::parse($bp->created_at)->locale('id')->isoFormat('HH:mm');
+            $waktuPemeriksaan = \Carbon\Carbon::parse($bp->created_at)->locale('id')->timezone(config('app.timezone'))->isoFormat('HH:mm');
 
             // Determine blood pressure category and color
             $category = '';
@@ -114,9 +114,6 @@
 
     <!-- Desktop View (Table Layout) -->
     <div class="hidden md:block">
-        <section class=>
-
-        </section>
         <table class="w-full text-sm border border-gray-200 dark:border-gray-700 rounded-xl">
             <thead>
                 <tr class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-900">
@@ -136,6 +133,47 @@
                     $rowBgClass = $isToday ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500' :
                                 ($isYesterday ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400' :
                                 'hover:bg-gray-50 dark:hover:bg-gray-800');
+
+                    // Duplicate variable definitions for table view
+                    $tanggalIndonesia = \Carbon\Carbon::parse($bp->date)->locale('id')->isoFormat('DD MMMM YYYY');
+                    $hariIndonesia = \Carbon\Carbon::parse($bp->date)->locale('id')->isoFormat('dddd');
+                    $waktuPemeriksaan = \Carbon\Carbon::parse($bp->created_at)->locale('id')->timezone(config('app.timezone'))->isoFormat('HH:mm');
+
+                    $sistole = $bp->sistole;
+                    $diastole = $bp->diastole;
+
+                    if ($sistole >= 180 || $diastole >= 120) {
+                        $category = 'Krisis Hipertensi';
+                        $categoryClass = 'bg-red-200 text-red-900 dark:bg-red-900 dark:text-red-100';
+                    } elseif ($sistole >= 140 || $diastole >= 90) {
+                        $category = 'Hipertensi';
+                        $categoryClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+                    } elseif ($sistole >= 130 || $diastole >= 80) {
+                        $category = 'Pra-Hipertensi';
+                        $categoryClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+                    } elseif ($sistole >= 120) {
+                        $category = 'Normal Tinggi';
+                        $categoryClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+                    } else {
+                        $category = 'Normal';
+                        $categoryClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+                    }
+
+                    $statusBadgeClass = match($bp->status) {
+                        'fit' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                        'unfit' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                        'under_observation' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+                        'pending' => 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+                        default => 'bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200'
+                    };
+
+                    $statusLabel = match($bp->status) {
+                        'Fit To Work' => 'Fit To Work',
+                        'Fit With Medical Therapy' => 'Fit With Medical Therapy',
+                        'Unfit' => 'Unfit',
+                        'Observasi' => 'Observasi',
+                        default => ucfirst($bp->status),
+                    };
                 @endphp
                 <tr class="border-b border-gray-100 dark:border-gray-800 {{ $rowBgClass }}">
                     <td class="py-3 px-4">
@@ -208,6 +246,13 @@
     </div>
 
     @if($bloodPressures->count() > 0)
+    @php
+        // Definisikan variabel di awal untuk digunakan di seluruh section
+        $latestBP = $bloodPressures->sortByDesc('created_at')->first();
+        $avgSistole = $bloodPressures->avg('sistole');
+        $avgDiastole = $bloodPressures->avg('diastole');
+    @endphp
+
     <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
         <!-- Summary Cards -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -215,28 +260,31 @@
             <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $bloodPressures->count() }}</div>
         </div>
 
-        @php
-            $latestBP = $bloodPressures->sortByDesc('date')->first();
-            $avgSistole = $bloodPressures->avg('sistole');
-            $avgDiastole = $bloodPressures->avg('diastole');
-        @endphp
-
+        <!-- Card Terakhir Diperiksa yang Diperbaiki -->
         <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="text-sm text-gray-600 dark:text-gray-400">Terakhir Diperiksa</div>
-            <div class="text-lg font-bold text-gray-900 dark:text-gray-100">
-                @if ($latestBP)
-                    {{ \Carbon\Carbon::parse($latestBP->date)
-                        ->locale('id')
-                        ->timezone('Asia/Makassar') // Sesuaikan dengan GMT+8
-                        ->diffForHumans() }}
-                @else
-                    -
-                @endif
-            </div>
+            @if ($latestBP)
+                @php
+                    $checkDateTime = \Carbon\Carbon::parse($latestBP->created_at)->timezone(config('app.timezone'));
+                @endphp
+                <div class="text-lg font-bold text-gray-900 dark:text-gray-100">
+                    @if ($checkDateTime->isToday())
+                        Hari ini
+                    @elseif ($checkDateTime->isYesterday())
+                        Kemarin
+                    @else
+                        {{ $checkDateTime->locale('id')->isoFormat('DD MMMM YYYY') }}
+                    @endif
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $checkDateTime->locale('id')->isoFormat('dddd, HH:mm') }} WIB
+                </div>
+            @else
+                <div class="text-lg font-bold text-gray-900 dark:text-gray-100">-</div>
+            @endif
         </div>
 
-
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="text-sm text-gray-600 dark:text-gray-400">Rata-rata</div>
             <div class="text-lg font-bold text-gray-900 dark:text-gray-100">
                 {{ number_format($avgSistole, 0) }}/{{ number_format($avgDiastole, 0) }} mmHg

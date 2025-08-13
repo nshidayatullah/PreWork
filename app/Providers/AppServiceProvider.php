@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use App\Policies\RolePolicy;
 use App\Policies\PermissionPolicy;
 use Spatie\Permission\Models\Role;
@@ -26,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Permission::class, PermissionPolicy::class);
         Gate::policy(Role::class, RolePolicy::class);
+        config(['app.locale' => 'id']);
+        Carbon::setLocale('id');
 
     }
 }

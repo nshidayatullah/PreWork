@@ -88,10 +88,6 @@ class EmployeeReportResource extends Resource
                             ->action(function ($record) {
                                 return redirect()->route('employee.report.pdf', ['employee' => $record->id]);
                             }),
-                        Tables\Actions\Action::make('close')
-                            ->label('Tutup')
-                            ->color('gray')
-                            ->action(fn () => null),
                     ]),
             ])
             ->defaultSort('Name');
