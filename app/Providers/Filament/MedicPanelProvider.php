@@ -31,7 +31,7 @@ class MedicPanelProvider extends PanelProvider
             ->default()
             ->id('medic')
             ->path('medic')
-            ->brandName('Medic Panel')
+            ->brandName('Pre Work Fit')
             ->favicon(asset('images/logo.png'))
             ->login(LoginCustom::class)
             ->colors([

@@ -65,7 +65,6 @@ class PeriodReportResource extends Resource
                      ->on('rosters.date', '=', 'bp.date');
             })
             ->whereIn('rosters.shift', ['shift 1', 'shift 2'])
-            ->whereBetween('rosters.date', ['2025-08-01', '2025-08-31'])
             ->groupBy('rosters.date')
             ->orderBy('rosters.date', 'asc');
     }
@@ -119,14 +118,14 @@ class PeriodReportResource extends Resource
                             ->required()
                             ->native(false)
                             ->displayFormat('d/m/Y')
-                            ->default('2025-08-01'),
+                            ->default(now()->startOfMonth()),
 
                         Forms\Components\DatePicker::make('sampai_tanggal')
                             ->label('Sampai Tanggal')
                             ->required()
                             ->native(false)
                             ->displayFormat('d/m/Y')
-                            ->default('2025-08-31'),
+                            ->default(now()->endOfMonth()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

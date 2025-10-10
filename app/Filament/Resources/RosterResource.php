@@ -28,17 +28,9 @@ class RosterResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Ambil semua tanggal unik yang ada di tabel roster
-        $dates = Roster::query()
-            ->selectRaw('DATE(date) as date_only')
-            ->distinct()
-            ->orderBy('date_only')
-            ->pluck('date_only')
-            ->map(fn ($d) => Carbon::parse($d));
-
         return $table
             ->query(
-                Employee::query()->with('rosters')
+                Employee::query()
             )
             ->columns([
                 Tables\Columns\TextColumn::make('NRP')
@@ -62,7 +54,7 @@ class RosterResource extends Resource
                     ->toggleable(),
 
                 // Loop header tanggal dengan SelectColumn untuk edit langsung
-                ...$dates->map(function ($date) {
+                ...self::getDatesForMonth()->map(function ($date) {
                     return SelectColumn::make('shift_' . $date->format('Y_m_d'))
                         ->label($date->format('d'))
                         ->options([
@@ -109,6 +101,79 @@ class RosterResource extends Resource
                         ]);
                 })->toArray(),
             ])
+            ->filters([
+                Tables\Filters\Filter::make('month')
+                    ->form([
+                        Forms\Components\Select::make('month')
+                            ->label('Bulan')
+                            ->options([
+                                1 => 'Januari',
+                                2 => 'Februari',
+                                3 => 'Maret',
+                                4 => 'April',
+                                5 => 'Mei',
+                                6 => 'Juni',
+                                7 => 'Juli',
+                                8 => 'Agustus',
+                                9 => 'September',
+                                10 => 'Oktober',
+                                11 => 'November',
+                                12 => 'Desember',
+                            ])
+                            ->default(now()->month),
+                        Forms\Components\Select::make('year')
+                            ->label('Tahun')
+                            ->options(function () {
+                                $currentYear = now()->year;
+                                $years = [];
+                                for ($i = $currentYear - 5; $i <= $currentYear + 5; $i++) {
+                                    $years[$i] = $i;
+                                }
+                                return $years;
+                            })
+                            ->default(now()->year),
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['month'] && $data['year']) {
+                            $startOfMonth = Carbon::create($data['year'], $data['month'], 1);
+                            $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+                            // Eager load only the roster records for the selected month
+                            $query->with(['rosters' => function ($q) use ($startOfMonth, $endOfMonth) {
+                                $q->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                            }]);
+                        } else {
+                            // If no filter, load with current month by default
+                            $startOfMonth = now()->startOfMonth();
+                            $endOfMonth = now()->endOfMonth();
+                            $query->with(['rosters' => function ($q) use ($startOfMonth, $endOfMonth) {
+                                $q->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')]);
+                            }]);
+                        }
+                        return $query;
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['month']) {
+                            $monthName = [
+                                1 => 'Januari',
+                                2 => 'Februari',
+                                3 => 'Maret',
+                                4 => 'April',
+                                5 => 'Mei',
+                                6 => 'Juni',
+                                7 => 'Juli',
+                                8 => 'Agustus',
+                                9 => 'September',
+                                10 => 'Oktober',
+                                11 => 'November',
+                                12 => 'Desember',
+                            ][$data['month']];
+                            $indicators[] = 'Bulan: ' . $monthName . ' ' . ($data['year'] ?? '');
+                        }
+                        return $indicators;
+                    }),
+            ])
             ->headerActions([
                 // Action untuk membuat periode baru
                 Tables\Actions\Action::make('create_period')
@@ -153,7 +218,7 @@ class RosterResource extends Resource
                     ->icon('heroicon-o-user-plus')
                     ->color('warning')
                     ->form([
-                        Forms\Components\CheckboxList::make('employee_ids')
+                        Forms\Components\CheckboxList::make('employee_id')
                             ->label('Pilih Karyawan Baru')
                             ->options(function () {
                                 // Ambil karyawan yang belum memiliki roster
@@ -161,8 +226,7 @@ class RosterResource extends Resource
                                 return Employee::whereNotIn('id', $employeesWithRoster)
                                     ->where('Status', true)
                                     ->pluck('Name', 'id');
-                            })
-                            ->required(),
+                            }),
 
                         Forms\Components\Grid::make(2)->schema([
                             DatePicker::make('start_date')
@@ -249,7 +313,7 @@ class RosterResource extends Resource
         $startDate = Carbon::parse($data['start_date']);
         $endDate = Carbon::parse($data['end_date']);
         $defaultShift = $data['default_shift'];
-        $employees = Employee::whereIn('id', $data['employee_ids'])->get();
+        $employees = Employee::whereIn('id', $data['employee_id'])->get();
 
         $processedCount = 0;
 
@@ -280,6 +344,37 @@ class RosterResource extends Resource
             ->body("Berhasil membuat {$processedCount} data roster untuk {$employees->count()} karyawan baru")
             ->success()
             ->send();
+    }
+
+    /**
+     * Get dates for the selected month
+     */
+    protected static function getDatesForMonth(): Collection
+    {
+        // Check if month filter is applied
+        $month = request('table-widgets.month') ?? request('table-filters.month');
+        $year = request('table-widgets.year') ?? request('table-filters.year');
+
+        if (!$month || !$year) {
+            // Default to current month if no filter is applied
+            $month = now()->month;
+            $year = now()->year;
+        }
+
+        $startOfMonth = Carbon::create($year, $month, 1);
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+        // Get unique dates for the selected month from roster and convert to Eloquent Collection
+        $dates = Roster::query()
+            ->whereBetween('date', [$startOfMonth->format('Y-m-d'), $endOfMonth->format('Y-m-d')])
+            ->selectRaw('DATE(date) as date_only')
+            ->distinct()
+            ->orderBy('date_only')
+            ->pluck('date_only')
+            ->map(fn ($d) => Carbon::parse($d));
+
+        // Convert to Eloquent Collection
+        return new \Illuminate\Database\Eloquent\Collection($dates->toArray());
     }
 
     public static function getPages(): array
